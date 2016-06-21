@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import java.util.List;
 import io.realm.Realm;
 
 public class ColorSwatchActivity extends AppCompatActivity {
+    private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView recyclerView;
     private ColorSwatchAdapter adapter;
     private ImageView imageView;
@@ -48,10 +50,14 @@ public class ColorSwatchActivity extends AppCompatActivity {
 
         init();
 
+        collapsingToolbarLayout.setTitle("ColorSwatch");
+        collapsingToolbarLayout.setExpandedTitleColor(
+                getResources().getColor(android.R.color.transparent));
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        Picasso.with(this).load(uri).into(imageView);
+        Picasso.with(this).load(uri).fit().centerCrop().into(imageView);
 
         try {
             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
@@ -66,6 +72,11 @@ public class ColorSwatchActivity extends AppCompatActivity {
                     List<Palette.Swatch> list = palette.getSwatches();
                     colorSwatches.addAll(ColorSwatch.createList(list));
                     adapter.notifyDataSetChanged();
+
+                    int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+                    int primary = getResources().getColor(R.color.colorPrimary);
+                    collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
+                    collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
                 }
             });
         }
@@ -96,6 +107,7 @@ public class ColorSwatchActivity extends AppCompatActivity {
     }
 
     private void init() {
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.swatch_rv_color_swatch);
         imageView = (ImageView) findViewById(R.id.swatch_iv_picture);
         fab = (FloatingActionButton) findViewById(R.id.swatch_fab);
