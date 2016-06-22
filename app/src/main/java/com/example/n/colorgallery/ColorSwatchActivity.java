@@ -1,6 +1,7 @@
 package com.example.n.colorgallery;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -84,8 +85,10 @@ public class ColorSwatchActivity extends AppCompatActivity {
 
                     int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
                     int primary = getResources().getColor(R.color.colorPrimary);
+                    int accent = getResources().getColor(R.color.colorAccent);
                     collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
                     collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
+                    fab.setBackgroundTintList(ColorStateList.valueOf(palette.getMutedColor(accent)));
                 }
             });
         }

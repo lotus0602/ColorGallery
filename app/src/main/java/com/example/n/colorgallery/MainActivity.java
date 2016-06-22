@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.example.n.adapter.ColorGalleryAdapter;
+import com.example.n.adapter.SpacesItemDecoration;
 import com.example.n.model.ColorGallery;
 
 import io.realm.Realm;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        SpacesItemDecoration decoration = new SpacesItemDecoration(10);
+        recyclerView.addItemDecoration(decoration);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
