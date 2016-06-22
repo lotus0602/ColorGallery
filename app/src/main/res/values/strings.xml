@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ColorGallery</string>
+
+    <string name="btn_group_hue">HUE</string>
+    <string name="btn_group_saturation">SATURATION</string>
+    <string name="btn_group_lightness">LIGHTNESS</string>
+    <string name="btn_group_population">POPULATION</string>
+
 </resources>

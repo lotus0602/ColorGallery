@@ -12,6 +12,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.n.adapter.ColorSwatchAdapter;
@@ -21,16 +22,24 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
 
 public class ColorSwatchActivity extends AppCompatActivity {
+    private static final String TAG_STRING_HUE = "hue";
+    private static final String TAG_STRING_SATURATION = "saturation";
+    private static final String TAG_STRING_LIGHTNESS = "lightness";
+    private static final String TAG_STRING_POPULATION = "population";
+
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView recyclerView;
     private ColorSwatchAdapter adapter;
     private ImageView imageView;
+    private Button btnHue, btnSaturation, btnLightness, btnPopulation;
     private FloatingActionButton fab;
 
     private ArrayList<ColorSwatch> colorSwatches;
@@ -110,11 +119,63 @@ public class ColorSwatchActivity extends AppCompatActivity {
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.swatch_rv_color_swatch);
         imageView = (ImageView) findViewById(R.id.swatch_iv_picture);
+        btnHue = (Button) findViewById(R.id.alignment_btn_hue);
+        btnSaturation = (Button) findViewById(R.id.alignment_btn_saturation);
+        btnLightness = (Button) findViewById(R.id.alignment_btn_lightness);
+        btnPopulation = (Button) findViewById(R.id.alignment_btn_population);
         fab = (FloatingActionButton) findViewById(R.id.swatch_fab);
         colorSwatches = new ArrayList<>();
 
         adapter = new ColorSwatchAdapter(colorSwatches);
+        btnHue.setOnClickListener(btnClickListener);
+        btnSaturation.setOnClickListener(btnClickListener);
+        btnLightness.setOnClickListener(btnClickListener);
+        btnPopulation.setOnClickListener(btnClickListener);
 
         realm = Realm.getDefaultInstance();
     }
+
+    private void sortList(final String s) {
+        Collections.sort(colorSwatches, new Comparator<ColorSwatch>() {
+            @Override
+            public int compare(ColorSwatch lhs, ColorSwatch rhs) {
+                switch (s) {
+                    case TAG_STRING_HUE:
+                        return lhs.getHsl()[0] > rhs.getHsl()[0] ? -1 :
+                                lhs.getHsl()[0] < rhs.getHsl()[0] ? 1 : 0;
+                    case TAG_STRING_SATURATION:
+                        return lhs.getHsl()[1] > rhs.getHsl()[1] ? -1 :
+                                lhs.getHsl()[1] < rhs.getHsl()[1] ? 1 : 0;
+                    case TAG_STRING_LIGHTNESS:
+                        return lhs.getHsl()[2] > rhs.getHsl()[2] ? -1 :
+                                lhs.getHsl()[2] < rhs.getHsl()[2] ? 1 : 0;
+                    case TAG_STRING_POPULATION:
+                        return lhs.getPopulation() > rhs.getPopulation() ? -1 :
+                                lhs.getPopulation() < rhs.getPopulation() ? 1 : 0;
+                }
+                return 0;
+            }
+        });
+    }
+
+    Button.OnClickListener btnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.alignment_btn_hue:
+                    sortList(TAG_STRING_HUE);
+                    break;
+                case R.id.alignment_btn_saturation:
+                    sortList(TAG_STRING_SATURATION);
+                    break;
+                case R.id.alignment_btn_lightness:
+                    sortList(TAG_STRING_LIGHTNESS);
+                    break;
+                case R.id.alignment_btn_population:
+                    sortList(TAG_STRING_POPULATION);
+                    break;
+            }
+            adapter.notifyDataSetChanged();
+        }
+    };
 }
