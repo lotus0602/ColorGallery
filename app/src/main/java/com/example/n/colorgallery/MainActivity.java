@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.example.n.adapter.ColorGalleryAdapter;
@@ -47,10 +48,20 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new ColorGalleryAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                Intent intent = new Intent(getApplicationContext(), ColorSwatchActivity.class);
-                intent.setData(realmResults.get(position).getImageUri());
-                intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_DETAIL);
-                startActivity(intent);
+                switch (v.getId()) {
+                    case R.id.item_color_gallery_iv:
+                        Intent intent = new Intent(getApplicationContext(), ColorSwatchActivity.class);
+                        intent.setData(realmResults.get(position).getImageUri());
+                        intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_DETAIL);
+                        startActivity(intent);
+                        break;
+                    case R.id.item_color_gallery_preview:
+                        Log.i("Item Click", "Click Preview");
+                        break;
+                    case R.id.item_color_gallery_delete:
+                        Log.i("Item Click", "Click Delete");
+                        break;
+                }
             }
         });
 

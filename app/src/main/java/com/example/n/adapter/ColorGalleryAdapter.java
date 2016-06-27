@@ -32,21 +32,27 @@ public class ColorGalleryAdapter extends RecyclerView.Adapter<ColorGalleryAdapte
         });
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView;
+    public static class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener{
+        public ImageView ivMain, ivPreview, ivDelete;
 
         public ViewHolder(final View itemView) {
             super(itemView);
 
-            imageView = (ImageView) itemView.findViewById(R.id.item_color_gallery_iv);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        listener.onItemClick(itemView, getLayoutPosition());
-                    }
-                }
-            });
+            ivMain = (ImageView) itemView.findViewById(R.id.item_color_gallery_iv);
+            ivPreview = (ImageView) itemView.findViewById(R.id.item_color_gallery_preview);
+            ivDelete = (ImageView) itemView.findViewById(R.id.item_color_gallery_delete);
+
+            ivMain.setOnClickListener(this);
+            ivPreview.setOnClickListener(this);
+            ivDelete.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (listener != null) {
+                listener.onItemClick(v, getLayoutPosition());
+            }
         }
     }
 
@@ -64,7 +70,7 @@ public class ColorGalleryAdapter extends RecyclerView.Adapter<ColorGalleryAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ColorGallery colorGallery = realmResults.get(position);
-        ImageView imageView = holder.imageView;
+        ImageView imageView = holder.ivMain;
 
         Picasso.with(context).load(colorGallery.getImageUri())
                 .fit().centerCrop().into(imageView);
