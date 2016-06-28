@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.item_color_gallery_delete:
                         Log.i("Item Click", "Click Delete");
+                        String uri = realmResults.get(position).getImageString();
+                        alertToDelete(uri);
                         break;
                 }
             }
@@ -125,6 +127,36 @@ public class MainActivity extends AppCompatActivity {
                     intent.setType("image/*");
                     startActivityForResult(Intent.createChooser(intent, "Select"), REQUEST_SELECT_PHOTO);
                 }
+            }
+        });
+        builder.show();
+    }
+
+    private void alertToDelete(final String uri) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.dialog_message_delete));
+
+        String positiveText = getString(android.R.string.ok);
+
+        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                realm.executeTransactionAsync(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        ColorGallery item = realm.where(ColorGallery.class)
+                                .equalTo("imageString", uri).findFirst();
+                        item.deleteFromRealm();
+                    }
+                });
+            }
+        });
+
+        String negativeText = getString(android.R.string.cancel);
+        builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
             }
         });
         builder.show();

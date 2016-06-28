@@ -6,4 +6,5 @@
     <string name="btn_group_lightness">LIGHTNESS</string>
     <string name="btn_group_population">POPULATION</string>
 
+    <string name="dialog_message_delete">Delete?</string>
 </resources>
