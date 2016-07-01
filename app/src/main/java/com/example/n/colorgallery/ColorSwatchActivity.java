@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.n.adapter.ColorSwatchAdapter;
+import com.example.n.listener.OnItemClickListener;
 import com.example.n.model.ColorGallery;
 import com.example.n.model.ColorSwatch;
 import com.squareup.picasso.Picasso;
@@ -44,6 +45,7 @@ public class ColorSwatchActivity extends AppCompatActivity {
     private FloatingActionButton fab;
 
     private ArrayList<ColorSwatch> colorSwatches;
+    private ColorGallery colorGallery;
     private String tag = "";
 
     private Realm realm;
@@ -56,44 +58,37 @@ public class ColorSwatchActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final Uri uri = intent.getData();
         tag = intent.getStringExtra(MainActivity.TAG_INTENT_KEY);
-        Bitmap bitmap = null;
 
         init();
 
-        collapsingToolbarLayout.setTitle("ColorSwatch");
-        collapsingToolbarLayout.setExpandedTitleColor(
-                getResources().getColor(android.R.color.transparent));
-
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         Picasso.with(this).load(uri).fit().centerCrop().into(imageView);
 
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (bitmap != null && !bitmap.isRecycled()) {
-            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(Palette palette) {
-                    List<Palette.Swatch> list = palette.getSwatches();
-                    colorSwatches.addAll(ColorSwatch.createList(list));
-                    adapter.notifyDataSetChanged();
-
-                    int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
-                    int primary = getResources().getColor(R.color.colorPrimary);
-                    int accent = getResources().getColor(R.color.colorAccent);
-                    collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(primary));
-                    collapsingToolbarLayout.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
-                    fab.setBackgroundTintList(ColorStateList.valueOf(palette.getMutedColor(accent)));
-                }
-            });
-        }
-
         if (tag.equals(MainActivity.TAG_INTENT_NEW)) {
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (bitmap != null && !bitmap.isRecycled()) {
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        List<Palette.Swatch> list = palette.getSwatches();
+                        colorSwatches.addAll(ColorSwatch.createList(uri.toString(), list));
+                        adapter.notifyDataSetChanged();
+
+                        colorGallery = new ColorGallery();
+                        colorGallery.setColorOfPalette(getBaseContext(), palette);
+
+                        collapsingToolbarLayout.setContentScrimColor(colorGallery.getMutedColor());
+                        collapsingToolbarLayout.setStatusBarScrimColor(colorGallery.getDarkMutedColor());
+                        fab.setBackgroundTintList(ColorStateList.valueOf(colorGallery.getVibrantColor()));
+                    }
+                });
+            }
+
             fab.setVisibility(View.VISIBLE);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -101,15 +96,35 @@ public class ColorSwatchActivity extends AppCompatActivity {
                     realm.executeTransactionAsync(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            ColorGallery colorGallery = realm.createObject(ColorGallery.class);
-                            colorGallery.setCreatedAt(new Date());
-                            colorGallery.setImageString(uri.toString());
+                            ColorGallery gallery = realm.copyToRealm(colorGallery);
+                            gallery.setCreatedAt(new Date());
+                            gallery.setImageString(uri.toString());
+                            gallery.setSwatches(realm.copyToRealm(colorSwatches));
                         }
                     });
                     finish();
                 }
             });
+
+        } else if (tag.equals(MainActivity.TAG_INTENT_DETAIL)) {
+            ColorGallery gallery = realm.where(ColorGallery.class)
+                    .equalTo("imageString", uri.toString()).findFirst();
+            colorSwatches.addAll(gallery.getSwatches());
+            adapter.notifyDataSetChanged();
+
+            collapsingToolbarLayout.setContentScrimColor(gallery.getMutedColor());
+            collapsingToolbarLayout.setStatusBarScrimColor(gallery.getDarkMutedColor());
         }
+
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -135,6 +150,10 @@ public class ColorSwatchActivity extends AppCompatActivity {
         btnLightness.setOnClickListener(btnClickListener);
         btnPopulation.setOnClickListener(btnClickListener);
 
+        collapsingToolbarLayout.setTitle("ColorSwatch");
+        collapsingToolbarLayout.setExpandedTitleColor(
+                getResources().getColor(android.R.color.transparent));
+
         realm = Realm.getDefaultInstance();
     }
 
@@ -144,14 +163,14 @@ public class ColorSwatchActivity extends AppCompatActivity {
             public int compare(ColorSwatch lhs, ColorSwatch rhs) {
                 switch (s) {
                     case TAG_STRING_HUE:
-                        return lhs.getHsl()[0] > rhs.getHsl()[0] ? -1 :
-                                lhs.getHsl()[0] < rhs.getHsl()[0] ? 1 : 0;
+                        return lhs.getHue() > rhs.getHue() ? -1 :
+                                lhs.getHue() < rhs.getHue() ? 1 : 0;
                     case TAG_STRING_SATURATION:
-                        return lhs.getHsl()[1] > rhs.getHsl()[1] ? -1 :
-                                lhs.getHsl()[1] < rhs.getHsl()[1] ? 1 : 0;
+                        return lhs.getSaturation() > rhs.getSaturation() ? -1 :
+                                lhs.getSaturation() < rhs.getSaturation() ? 1 : 0;
                     case TAG_STRING_LIGHTNESS:
-                        return lhs.getHsl()[2] > rhs.getHsl()[2] ? -1 :
-                                lhs.getHsl()[2] < rhs.getHsl()[2] ? 1 : 0;
+                        return lhs.getLightness() > rhs.getLightness() ? -1 :
+                                lhs.getLightness() < rhs.getLightness() ? 1 : 0;
                     case TAG_STRING_POPULATION:
                         return lhs.getPopulation() > rhs.getPopulation() ? -1 :
                                 lhs.getPopulation() < rhs.getPopulation() ? 1 : 0;

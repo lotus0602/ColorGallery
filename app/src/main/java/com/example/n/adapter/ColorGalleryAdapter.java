@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.n.colorgallery.R;
+import com.example.n.listener.OnItemClickListener;
 import com.example.n.model.ColorGallery;
 import com.squareup.picasso.Picasso;
 
@@ -36,7 +37,7 @@ public class ColorGalleryAdapter extends RecyclerView.Adapter<ColorGalleryAdapte
             implements View.OnClickListener{
         public ImageView ivMain, ivPreview, ivDelete;
 
-        public ViewHolder(final View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
 
             ivMain = (ImageView) itemView.findViewById(R.id.item_color_gallery_iv);
@@ -79,10 +80,6 @@ public class ColorGalleryAdapter extends RecyclerView.Adapter<ColorGalleryAdapte
     @Override
     public int getItemCount() {
         return realmResults.size();
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(View v, int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

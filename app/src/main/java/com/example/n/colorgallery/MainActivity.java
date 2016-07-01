@@ -15,11 +15,13 @@ import android.view.View;
 
 import com.example.n.adapter.ColorGalleryAdapter;
 import com.example.n.adapter.SpacesItemDecoration;
+import com.example.n.listener.OnItemClickListener;
 import com.example.n.model.ColorGallery;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CAMERA = 1;
@@ -42,10 +44,11 @@ public class MainActivity extends AppCompatActivity {
 
         init();
 
-        realmResults = realm.where(ColorGallery.class).findAllAsync();
+        realmResults = realm.where(ColorGallery.class)
+                .findAllSortedAsync("createdAt", Sort.DESCENDING);
 
         adapter = new ColorGalleryAdapter(realmResults);
-        adapter.setOnItemClickListener(new ColorGalleryAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
                 switch (v.getId()) {

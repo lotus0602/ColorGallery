@@ -5,9 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.n.colorgallery.R;
+import com.example.n.listener.OnItemClickListener;
 import com.example.n.model.ColorSwatch;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
  */
 public class ColorSwatchAdapter extends RecyclerView.Adapter<ColorSwatchAdapter.ViewHolder> {
     private List<ColorSwatch> mColorSwatches;
+    private static OnItemClickListener listener;
 
     public ColorSwatchAdapter(List<ColorSwatch> colorSwatches) {
         this.mColorSwatches = colorSwatches;
@@ -24,11 +27,22 @@ public class ColorSwatchAdapter extends RecyclerView.Adapter<ColorSwatchAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView textView;
+        private ImageButton ibFavorite;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             textView = (TextView) itemView.findViewById(R.id.item_color_swatch_tv);
+            ibFavorite = (ImageButton) itemView.findViewById(R.id.item_color_swatch_favorite);
+
+            ibFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onItemClick(v, getLayoutPosition());
+                    }
+                }
+            });
         }
     }
 
@@ -58,5 +72,9 @@ public class ColorSwatchAdapter extends RecyclerView.Adapter<ColorSwatchAdapter.
     @Override
     public int getItemCount() {
         return mColorSwatches.size();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        ColorSwatchAdapter.listener = listener;
     }
 }
