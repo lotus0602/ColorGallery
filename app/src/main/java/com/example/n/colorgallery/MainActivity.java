@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.n.adapter.ColorGalleryAdapter;
 import com.example.n.adapter.SpacesItemDecoration;
@@ -20,6 +21,7 @@ import com.example.n.model.ColorGallery;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -96,10 +98,17 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CAMERA | requestCode == REQUEST_SELECT_PHOTO) {
-                Intent intent = new Intent(this, ColorSwatchActivity.class);
-                intent.setData(data.getData());
-                intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_NEW);
-                startActivity(intent);
+                ColorGallery colorGallery = realm.where(ColorGallery.class)
+                        .equalTo("imageString", data.getData().toString()).findFirst();
+
+                if (colorGallery == null) {
+                    Intent intent = new Intent(this, ColorSwatchActivity.class);
+                    intent.setData(data.getData());
+                    intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_NEW);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Selected Image Uri Exist!!", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
