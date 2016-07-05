@@ -67,6 +67,12 @@ public class ColorSwatchAdapter extends RecyclerView.Adapter<ColorSwatchAdapter.
         String s = "RGB : #" + Integer.toHexString(colorSwatch.getRgb()).toUpperCase() +
                 "\nPopulation : " + colorSwatch.getPopulation();
         textView.setText(s);
+
+        if (colorSwatch.isFavorite()) {
+            holder.ibFavorite.setPressed(true);
+        } else {
+            holder.ibFavorite.setPressed(false);
+        }
     }
 
     @Override

@@ -76,7 +76,7 @@ public class ColorSwatchActivity extends AppCompatActivity {
                     @Override
                     public void onGenerated(Palette palette) {
                         List<Palette.Swatch> list = palette.getSwatches();
-                        colorSwatches.addAll(ColorSwatch.createList(uri.toString(), list));
+                        colorSwatches.addAll(ColorSwatch.createList(list));
                         adapter.notifyDataSetChanged();
 
                         colorGallery = new ColorGallery();
@@ -99,7 +99,7 @@ public class ColorSwatchActivity extends AppCompatActivity {
                             ColorGallery gallery = realm.copyToRealm(colorGallery);
                             gallery.setCreatedAt(new Date());
                             gallery.setImageString(uri.toString());
-                            gallery.setSwatches(realm.copyToRealm(colorSwatches));
+                            gallery.setSwatches(realm.copyToRealmOrUpdate(colorSwatches));
                         }
                     });
                     finish();
@@ -109,7 +109,7 @@ public class ColorSwatchActivity extends AppCompatActivity {
         } else if (tag.equals(MainActivity.TAG_INTENT_DETAIL)) {
             ColorGallery gallery = realm.where(ColorGallery.class)
                     .equalTo("imageString", uri.toString()).findFirst();
-            colorSwatches.addAll(gallery.getSwatches());
+            colorSwatches.addAll(realm.copyFromRealm(gallery.getSwatches()));
             adapter.notifyDataSetChanged();
 
             collapsingToolbarLayout.setContentScrimColor(gallery.getMutedColor());
@@ -118,8 +118,23 @@ public class ColorSwatchActivity extends AppCompatActivity {
 
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(View v, int position) {
-
+            public void onItemClick(View v, final int position) {
+                realm.executeTransactionAsync(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        if (colorSwatches.get(position).isFavorite()) {
+                            colorSwatches.get(position).setFavorite(false);
+                        } else {
+                            colorSwatches.get(position).setFavorite(true);
+                        }
+                        realm.copyToRealmOrUpdate(colorSwatches.get(position));
+                    }
+                }, new Realm.Transaction.OnSuccess() {
+                    @Override
+                    public void onSuccess() {
+                        adapter.notifyItemChanged(position);
+                    }
+                });
             }
         });
 

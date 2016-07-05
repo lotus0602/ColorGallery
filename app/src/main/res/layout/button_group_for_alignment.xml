@@ -8,22 +8,26 @@
 
     <Button
         android:id="@+id/alignment_btn_hue"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/btn_group_hue"/>
     <Button
         android:id="@+id/alignment_btn_saturation"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/btn_group_saturation"/>
     <Button
         android:id="@+id/alignment_btn_lightness"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/btn_group_lightness"/>
     <Button
         android:id="@+id/alignment_btn_population"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="@string/btn_group_population"/>
 </LinearLayout>

@@ -15,13 +15,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.n.adapter.ColorGalleryAdapter;
-import com.example.n.adapter.SpacesItemDecoration;
 import com.example.n.listener.OnItemClickListener;
 import com.example.n.model.ColorGallery;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -73,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        SpacesItemDecoration decoration = new SpacesItemDecoration(10);
-        recyclerView.addItemDecoration(decoration);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
