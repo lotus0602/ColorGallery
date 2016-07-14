@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">ColorGallery</string>
 
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
     <string name="btn_group_hue">HUE</string>
     <string name="btn_group_saturation">SATURATION</string>
     <string name="btn_group_lightness">LIGHTNESS</string>

@@ -2,8 +2,13 @@ package com.example.n.colorgallery;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,24 +16,38 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.n.adapter.ColorGalleryAdapter;
+import com.example.n.animation.SideMenuAnimator;
 import com.example.n.listener.OnItemClickListener;
 import com.example.n.model.ColorGallery;
+import com.example.n.model.SideMenuItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements SideMenuAnimator.SideMenuAnimatorListener{
     public static final int REQUEST_CAMERA = 1;
     public static final int REQUEST_SELECT_PHOTO = 2;
     public static final String TAG_INTENT_KEY = "tag";
     public static final String TAG_INTENT_NEW = "new";
     public static final String TAG_INTENT_DETAIL = "detail";
+
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private LinearLayout sideMenu;
+    private List<SideMenuItem> menuItemList;
+    private SideMenuAnimator sideMenuAnimator;
 
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
@@ -79,8 +98,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setActionBar();
+        createSideMenuList();
+        sideMenuAnimator = new SideMenuAnimator(
+                this, drawerLayout, sideMenu, menuItemList, this);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -110,12 +151,66 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        sideMenu = (LinearLayout) findViewById(R.id.side_menu);
         recyclerView = (RecyclerView) findViewById(R.id.main_rv_color_gallery);
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
+
+        drawerLayout.setScrimColor(Color.TRANSPARENT);
+        sideMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.closeDrawers();
+            }
+        });
 
         RealmConfiguration configuration = new RealmConfiguration.Builder(this).build();
         Realm.setDefaultConfiguration(configuration);
         realm = Realm.getDefaultInstance();
+    }
+
+    private void setActionBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.drawer_open,
+                R.string.drawer_close
+        ) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                sideMenu.removeAllViews();
+                sideMenu.invalidate();
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+                if (slideOffset > 0.6 && sideMenu.getChildCount() == 0) {
+                    sideMenuAnimator.showSideMenu();
+                }
+            }
+        };
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    private void createSideMenuList() {
+        menuItemList = new ArrayList<>();
+        menuItemList.add(new SideMenuItem(R.drawable.ic_collections_black_48dp));
+        menuItemList.add(new SideMenuItem(R.drawable.ic_camera_black_48dp));
+        menuItemList.add(new SideMenuItem(R.drawable.ic_palette_black_48dp));
+        menuItemList.add(new SideMenuItem(R.drawable.ic_star_black_48dp));
     }
 
     private void selectImage() {
@@ -166,5 +261,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+
+    @Override
+    public void enableHomeButton(boolean enable) {
+        getSupportActionBar().setHomeButtonEnabled(enable);
+    }
+
+    @Override
+    public void addViewToContainer(View view) {
+        sideMenu.addView(view);
     }
 }
