@@ -119,14 +119,15 @@ public class ColorSwatchActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View v, final int position) {
+                if (colorSwatches.get(position).isFavorite()) {
+                    colorSwatches.get(position).setFavorite(false);
+                } else {
+                    colorSwatches.get(position).setFavorite(true);
+                }
+
                 realm.executeTransactionAsync(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        if (colorSwatches.get(position).isFavorite()) {
-                            colorSwatches.get(position).setFavorite(false);
-                        } else {
-                            colorSwatches.get(position).setFavorite(true);
-                        }
                         realm.copyToRealmOrUpdate(colorSwatches.get(position));
                     }
                 }, new Realm.Transaction.OnSuccess() {

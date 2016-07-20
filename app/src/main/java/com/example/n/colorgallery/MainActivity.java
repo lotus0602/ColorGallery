@@ -7,15 +7,15 @@ import android.graphics.Color;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -23,7 +23,8 @@ import android.widget.Toast;
 
 import com.example.n.adapter.ColorGalleryAdapter;
 import com.example.n.animation.SideMenuAnimator;
-import com.example.n.listener.OnItemClickListener;
+import com.example.n.fragment.ColorFavoriteFragment;
+import com.example.n.fragment.ColorGalleryFragment;
 import com.example.n.model.ColorGallery;
 import com.example.n.model.SideMenuItem;
 
@@ -33,7 +34,6 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity
         implements SideMenuAnimator.SideMenuAnimatorListener{
@@ -63,33 +63,36 @@ public class MainActivity extends AppCompatActivity
 
         init();
 
-        realmResults = realm.where(ColorGallery.class)
-                .findAllSortedAsync("createdAt", Sort.DESCENDING);
-
-        adapter = new ColorGalleryAdapter(realmResults);
-        adapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                switch (v.getId()) {
-                    case R.id.item_color_gallery_iv:
-                        Intent intent = new Intent(getApplicationContext(), ColorSwatchActivity.class);
-                        intent.setData(realmResults.get(position).getImageUri());
-                        intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_DETAIL);
-                        startActivity(intent);
-                        break;
-                    case R.id.item_color_gallery_preview:
-                        Log.i("Item Click", "Click Preview");
-                        break;
-                    case R.id.item_color_gallery_delete:
-                        Log.i("Item Click", "Click Delete");
-                        alertToDelete(position);
-                        break;
-                }
-            }
-        });
-
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+//        realmResults = realm.where(ColorGallery.class)
+//                .findAllSortedAsync("createdAt", Sort.DESCENDING);
+//
+//        adapter = new ColorGalleryAdapter(realmResults);
+//        adapter.setOnItemClickListener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View v, int position) {
+//                switch (v.getId()) {
+//                    case R.id.item_color_gallery_iv:
+//                        Intent intent = new Intent(getApplicationContext(), ColorSwatchActivity.class);
+//                        intent.setData(realmResults.get(position).getImageUri());
+//                        intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_DETAIL);
+//                        startActivity(intent);
+//                        break;
+//                    case R.id.item_color_gallery_preview:
+//                        Log.i("Item Click", "Click Preview");
+//                        break;
+//                    case R.id.item_color_gallery_delete:
+//                        Log.i("Item Click", "Click Delete");
+//                        alertToDelete(position);
+//                        break;
+//                }
+//            }
+//        });
+//
+//        recyclerView.setAdapter(adapter);
+//        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        if (savedInstanceState == null) {
+            switchFragment(new ColorGalleryFragment());
+        }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,7 +156,7 @@ public class MainActivity extends AppCompatActivity
     private void init(){
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         sideMenu = (LinearLayout) findViewById(R.id.side_menu);
-        recyclerView = (RecyclerView) findViewById(R.id.main_rv_color_gallery);
+//        recyclerView = (RecyclerView) findViewById(R.id.main_rv_color_gallery);
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
 
         drawerLayout.setScrimColor(Color.TRANSPARENT);
@@ -234,42 +237,69 @@ public class MainActivity extends AppCompatActivity
         builder.show();
     }
 
-    private void alertToDelete(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.dialog_message_delete));
+    private void switchFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.main_fragment_container, fragment).commit();
+    }
+//    private void alertToDelete(final int position) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage(getString(R.string.dialog_message_delete));
+//
+//        String positiveText = getString(android.R.string.ok);
+//
+//        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                realm.executeTransactionAsync(new Realm.Transaction() {
+//                    @Override
+//                    public void execute(Realm realm) {
+//                        ColorGallery item = realmResults.get(position);
+//                        item.deleteFromRealm();
+//                    }
+//                });
+//            }
+//        });
+//
+//        String negativeText = getString(android.R.string.cancel);
+//        builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//        builder.show();
+//    }
 
-        String positiveText = getString(android.R.string.ok);
+    @Override
+    public void addViewToContainer(View view) {
+        sideMenu.addView(view);
+    }
 
-        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                realm.executeTransactionAsync(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        ColorGallery item = realmResults.get(position);
-                        item.deleteFromRealm();
-                    }
-                });
-            }
-        });
+    @Override
+    public void onSwitch(int position) {
+        Fragment fragment = null;
+        switch (position) {
+            case 0:
+                fragment = new ColorGalleryFragment();
+                fab.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                fragment = new ColorFavoriteFragment();
+                fab.setVisibility(View.INVISIBLE);
+                break;
+        }
 
-        String negativeText = getString(android.R.string.cancel);
-        builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
+        if (fragment != null) {
+            switchFragment(fragment);
+        }
     }
 
     @Override
     public void enableHomeButton(boolean enable) {
         getSupportActionBar().setHomeButtonEnabled(enable);
-    }
-
-    @Override
-    public void addViewToContainer(View view) {
-        sideMenu.addView(view);
     }
 }

@@ -3,7 +3,6 @@ package com.example.n.animation;
 import android.app.Activity;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -57,7 +56,7 @@ public class SideMenuAnimator {
             viewMenuItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    switchItem();
+                    switchItem(position);
                 }
             });
 
@@ -163,11 +162,13 @@ public class SideMenuAnimator {
         }
     }
 
-    private void switchItem() {
+    private void switchItem(int position) {
+        animatorListener.onSwitch(position);
         hideSideMenu();
     }
 
     public interface SideMenuAnimatorListener {
+        void onSwitch(int position);
         void addViewToContainer(View view);
         void enableHomeButton(boolean enable);
     }
