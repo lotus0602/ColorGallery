@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,14 +56,20 @@ public class ColorFavoriteFragment extends Fragment {
         realm = Realm.getDefaultInstance();
         realmResults = realm.where(ColorSwatch.class)
                 .equalTo("isFavorite", true).findAllAsync();
-        realmResults.addChangeListener(callback);
+        realmResults.addChangeListener(loadFavoriteColorListener);
 
         adapter = new ColorFavoriteAdapter(realmResults);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
-    private RealmChangeListener<RealmResults<ColorSwatch>> callback = new RealmChangeListener<RealmResults<ColorSwatch>>() {
+    @Override
+    public void onStop() {
+        super.onStop();
+        realmResults.removeChangeListener(loadFavoriteColorListener);
+    }
+
+    private RealmChangeListener<RealmResults<ColorSwatch>> loadFavoriteColorListener = new RealmChangeListener<RealmResults<ColorSwatch>>() {
         @Override
         public void onChange(RealmResults<ColorSwatch> element) {
             adapter.notifyDataSetChanged();

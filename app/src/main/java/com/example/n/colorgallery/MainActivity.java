@@ -14,14 +14,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.n.adapter.ColorGalleryAdapter;
 import com.example.n.animation.SideMenuAnimator;
 import com.example.n.fragment.ColorFavoriteFragment;
 import com.example.n.fragment.ColorGalleryFragment;
@@ -33,7 +31,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity
         implements SideMenuAnimator.SideMenuAnimatorListener{
@@ -49,12 +46,9 @@ public class MainActivity extends AppCompatActivity
     private List<SideMenuItem> menuItemList;
     private SideMenuAnimator sideMenuAnimator;
 
-    private RecyclerView recyclerView;
     private FloatingActionButton fab;
-    private ColorGalleryAdapter adapter;
 
     private Realm realm;
-    private RealmResults<ColorGallery> realmResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,33 +57,6 @@ public class MainActivity extends AppCompatActivity
 
         init();
 
-//        realmResults = realm.where(ColorGallery.class)
-//                .findAllSortedAsync("createdAt", Sort.DESCENDING);
-//
-//        adapter = new ColorGalleryAdapter(realmResults);
-//        adapter.setOnItemClickListener(new OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View v, int position) {
-//                switch (v.getId()) {
-//                    case R.id.item_color_gallery_iv:
-//                        Intent intent = new Intent(getApplicationContext(), ColorSwatchActivity.class);
-//                        intent.setData(realmResults.get(position).getImageUri());
-//                        intent.putExtra(TAG_INTENT_KEY, TAG_INTENT_DETAIL);
-//                        startActivity(intent);
-//                        break;
-//                    case R.id.item_color_gallery_preview:
-//                        Log.i("Item Click", "Click Preview");
-//                        break;
-//                    case R.id.item_color_gallery_delete:
-//                        Log.i("Item Click", "Click Delete");
-//                        alertToDelete(position);
-//                        break;
-//                }
-//            }
-//        });
-//
-//        recyclerView.setAdapter(adapter);
-//        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         if (savedInstanceState == null) {
             switchFragment(new ColorGalleryFragment());
         }
@@ -156,7 +123,6 @@ public class MainActivity extends AppCompatActivity
     private void init(){
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         sideMenu = (LinearLayout) findViewById(R.id.side_menu);
-//        recyclerView = (RecyclerView) findViewById(R.id.main_rv_color_gallery);
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
 
         drawerLayout.setScrimColor(Color.TRANSPARENT);
@@ -241,34 +207,6 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.main_fragment_container, fragment).commit();
     }
-//    private void alertToDelete(final int position) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage(getString(R.string.dialog_message_delete));
-//
-//        String positiveText = getString(android.R.string.ok);
-//
-//        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                realm.executeTransactionAsync(new Realm.Transaction() {
-//                    @Override
-//                    public void execute(Realm realm) {
-//                        ColorGallery item = realmResults.get(position);
-//                        item.deleteFromRealm();
-//                    }
-//                });
-//            }
-//        });
-//
-//        String negativeText = getString(android.R.string.cancel);
-//        builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//            }
-//        });
-//        builder.show();
-//    }
 
     @Override
     public void addViewToContainer(View view) {

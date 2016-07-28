@@ -12,6 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.example.n.adapter.ColorGalleryAdapter;
 import com.example.n.colorgallery.ColorSwatchActivity;
@@ -67,6 +71,7 @@ public class ColorGalleryFragment extends Fragment {
                         break;
                     case R.id.item_color_gallery_preview:
                         Log.i("Item Click", "Click Preview");
+                        popupPreview(v, position);
                         break;
                     case R.id.item_color_gallery_delete:
                         Log.i("Item Click", "Click Delete");
@@ -106,5 +111,38 @@ public class ColorGalleryFragment extends Fragment {
             }
         });
         builder.show();
+    }
+
+    private void popupPreview(View anchorView, int position) {
+        PopupWindow popupWindow = new PopupWindow(getActivity());
+        LinearLayout container = new LinearLayout(getActivity());
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        ColorGallery gallery = realmResults.get(position);
+        int color[] = {gallery.getMutedColor(),
+                gallery.getLightMutedColor(),
+                gallery.getDarkMutedColor(),
+                gallery.getVibrantColor(),
+                gallery.getLightVibrantColor(),
+                gallery.getDarkVibrantColor()};
+
+        for (int c : color) {
+            TextView textView = new TextView(getContext());
+            textView.setPadding(5, 5, 5, 5);
+            textView.setBackgroundColor(c);
+            String s = "RGB : #" + Integer.toHexString(c).toUpperCase();
+            textView.setText(s);
+            container.addView(textView);
+        }
+        popupWindow.setContentView(container);
+
+        popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setFocusable(true);
+
+        container.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        popupWindow.showAsDropDown(anchorView, 0, -(container.getMeasuredHeight() + 70));
     }
 }
