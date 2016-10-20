@@ -1,13 +1,11 @@
 package com.example.n.fragment;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,7 +44,6 @@ public class SwatchListFragment extends Fragment {
     private RecyclerView recyclerView;
     private ColorSwatchAdapter adapter;
     private Button btnHue, btnSaturation, btnLightness, btnPopulation;
-//    private FloatingActionButton fab;
 
     private OnCollapsingToolbarListener mListener;
 
@@ -116,8 +113,6 @@ public class SwatchListFragment extends Fragment {
                         colorGallery = new ColorGallery();
                         colorGallery.setColorOfPalette(getContext(), palette);
 
-//                        fab.setBackgroundTintList(ColorStateList.valueOf(colorGallery.getVibrantColor()));
-
                         if (mListener != null) {
                             mListener.enableCollapsingToolbar(colorGallery.getMutedColor(), colorGallery.getDarkMutedColor());
                             mListener.enableFloatingActionButton(colorGallery.getVibrantColor());
@@ -125,23 +120,6 @@ public class SwatchListFragment extends Fragment {
                     }
                 });
             }
-
-//            fab.setVisibility(View.VISIBLE);
-//            fab.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    realm.executeTransactionAsync(new Realm.Transaction() {
-//                        @Override
-//                        public void execute(Realm realm) {
-//                            ColorGallery gallery = realm.copyToRealm(colorGallery);
-//                            gallery.setCreatedAt(new Date());
-//                            gallery.setImageString(uri.toString());
-//                            gallery.setSwatches(realm.copyToRealmOrUpdate(colorSwatches));
-//                        }
-//                    });
-//                    getActivity().finish();
-//                }
-//            });
         } else if (tag.equals(MainActivity.TAG_INTENT_DETAIL)) {
             ColorGallery gallery = realm.where(ColorGallery.class)
                     .equalTo("imageString", uri.toString()).findFirst();
@@ -198,7 +176,6 @@ public class SwatchListFragment extends Fragment {
         btnSaturation = (Button) v.findViewById(R.id.alignment_btn_saturation);
         btnLightness = (Button) v.findViewById(R.id.alignment_btn_lightness);
         btnPopulation = (Button) v.findViewById(R.id.alignment_btn_population);
-//        fab = (FloatingActionButton) v.findViewById(R.id.swatch_fab);
 
         colorSwatches = new ArrayList<>();
         adapter = new ColorSwatchAdapter(colorSwatches);

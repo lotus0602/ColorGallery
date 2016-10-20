@@ -31,7 +31,7 @@ import com.squareup.picasso.Picasso;
 public class SwatchExtractFragment extends Fragment {
 
     private RelativeLayout targetContainer;
-    private ImageView targetImageView, extractColorView;
+    private ImageView targetImageView, targetOverlay, extractColorView;
     private TextView extractColorTextView;
 
     private OnCollapsingToolbarListener mListener;
@@ -71,6 +71,7 @@ public class SwatchExtractFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_swatch_extract, container, false);
         targetContainer = (RelativeLayout) v.findViewById(R.id.extract_color_target_container);
         targetImageView = (ImageView) v.findViewById(R.id.extract_color_target_iv);
+        targetOverlay = (ImageView) v.findViewById(R.id.extract_color_overlay_iv);
         extractColorView = (ImageView) v.findViewById(R.id.extract_color_iv);
         extractColorTextView = (TextView) v.findViewById(R.id.extract_color_tv);
 
@@ -99,7 +100,7 @@ public class SwatchExtractFragment extends Fragment {
             }
         });
 
-        targetContainer.setOnTouchListener(new View.OnTouchListener() {
+        targetImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 float eventX = event.getX();
@@ -128,6 +129,19 @@ public class SwatchExtractFragment extends Fragment {
                 int touchedPixel = mBitmap.getPixel(x, y);
                 extractColorView.setBackgroundColor(touchedPixel);
                 extractColorTextView.setText("#" + Integer.toHexString(touchedPixel));
+
+                targetOverlay.setVisibility(View.VISIBLE);
+                targetOverlay.bringToFront();
+                final float dx = targetOverlay.getX() - eventX;
+                final float dy = targetOverlay.getY() - eventY;
+                targetOverlay.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        targetOverlay.setX(targetOverlay.getX() - dx - targetOverlay.getPivotX());
+                        targetOverlay.setY(targetOverlay.getY() - dy - targetOverlay.getPivotY());
+                        Log.d("Runnable", "X : " + targetOverlay.getX() + " Y : " + targetOverlay.getY());
+                    }
+                });
 
                 return true;
             }
