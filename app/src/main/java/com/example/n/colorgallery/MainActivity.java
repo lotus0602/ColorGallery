@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.n.animation.SideMenuAnimator;
+import com.example.n.fragment.ColorCameraPreviewFragment;
 import com.example.n.fragment.ColorFavoriteFragment;
 import com.example.n.fragment.ColorGalleryFragment;
 import com.example.n.model.ColorGallery;
@@ -222,6 +223,8 @@ public class MainActivity extends AppCompatActivity
                 fab.setVisibility(View.VISIBLE);
                 break;
             case 1:
+                fragment = new ColorCameraPreviewFragment();
+                fab.setVisibility(View.INVISIBLE);
                 break;
             case 2:
                 break;
