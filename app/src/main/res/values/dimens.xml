@@ -11,4 +11,5 @@
     <dimen name="grid_item_image_height">150dp</dimen>
     <dimen name="app_bar_height">200dp</dimen>
     <dimen name="extract_color_square_size">75dp</dimen>
+    <dimen name="overlay_color_square_size">45dp</dimen>
 </resources>
